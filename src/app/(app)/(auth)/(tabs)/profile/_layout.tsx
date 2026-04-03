@@ -1,19 +1,23 @@
-import React from 'react';
 import { Stack } from 'expo-router';
+import { Fonts } from '../../../../../../constants/theme';
 
-const ProfileLayout = () => {
+const Page = () => {
   return (
     <Stack screenOptions={{ contentStyle: { backgroundColor: '#fff' } }}>
       <Stack.Screen
         name="index"
         options={{
-          title: 'Profile',
           headerLargeTitle: true,
+          headerTitle: 'Profile',
           headerTransparent: true,
+          headerLargeTitleStyle: {
+            fontFamily: Fonts.brandBold,
+            fontWeight: '900',
+            color: '#000',
+          },
         }}
       />
     </Stack>
   );
 };
-
-export default ProfileLayout;
+export default Page;

@@ -2,12 +2,18 @@ import { PurchaseButton } from '@/components/buttons/PurchaseButton';
 import { useCartStore } from '@/hooks/use-cartstore';
 import type { OrderData } from '@/services/orderService';
 import { orderService } from '@/services/orderService';
-import { Host, Picker } from '@expo/ui/swift-ui';
 import { Ionicons } from '@expo/vector-icons';
 import { AppleMaps } from 'expo-maps';
 import { Link, Stack, useRouter } from 'expo-router';
 import { useState } from 'react';
-import { Platform, StyleSheet, Switch, Text, TouchableOpacity, View } from 'react-native';
+import {
+  Platform,
+  StyleSheet,
+  Switch,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import Animated, {
   Extrapolation,
   interpolate,
@@ -27,9 +33,13 @@ const Page = () => {
   const scrollOffset = useSharedValue(0);
 
   // State
-  const [deliveryMode, setDeliveryMode] = useState<'delivery' | 'pickup'>('delivery');
+  const [deliveryMode, setDeliveryMode] = useState<'delivery' | 'pickup'>(
+    'delivery',
+  );
   const [leaveAtDoor, setLeaveAtDoor] = useState(false);
-  const [deliveryTime, setDeliveryTime] = useState<'standard' | 'schedule' | null>(null);
+  const [deliveryTime, setDeliveryTime] = useState<
+    'standard' | 'schedule' | null
+  >(null);
   const [tipAmount, setTipAmount] = useState(0);
 
   // Calculate fees
@@ -47,9 +57,14 @@ const Page = () => {
       scrollOffset.value,
       [-100, 0, 200],
       [1.3, 1, 0.9],
-      Extrapolation.CLAMP
+      Extrapolation.CLAMP,
     );
-    const translateY = interpolate(scrollOffset.value, [0, 200], [0, -50], Extrapolation.CLAMP);
+    const translateY = interpolate(
+      scrollOffset.value,
+      [0, 200],
+      [0, -50],
+      Extrapolation.CLAMP,
+    );
 
     return {
       transform: [{ scale }, { translateY }],
@@ -113,24 +128,44 @@ const Page = () => {
       <Animated.ScrollView
         onScroll={scrollHandler}
         scrollEventThrottle={16}
-        contentContainerStyle={[styles.scrollContent, { paddingTop: MAP_HEIGHT }]}
-        showsVerticalScrollIndicator={false}>
+        contentContainerStyle={[
+          styles.scrollContent,
+          { paddingTop: MAP_HEIGHT },
+        ]}
+        showsVerticalScrollIndicator={false}
+      >
         <View style={styles.contentContainer}>
           <View style={styles.section}>
-            <Host matchContents>
-              <Picker
-                options={['Delivery', 'Pickup']}
-                selectedIndex={deliveryMode === 'delivery' ? 0 : 1}
-                variant="segmented"
-              />
-            </Host>
+            <View style={styles.segmentedContainer}>
+              {['delivery', 'pickup'].map((mode) => (
+                <TouchableOpacity
+                  key={mode}
+                  style={[
+                    styles.segment,
+                    deliveryMode === mode && styles.segmentActive,
+                  ]}
+                  onPress={() => setDeliveryMode(mode as 'delivery' | 'pickup')}
+                >
+                  <Text
+                    style={[
+                      styles.segmentText,
+                      deliveryMode === mode && styles.segmentTextActive,
+                    ]}
+                  >
+                    {mode === 'delivery' ? 'Delivery' : 'Pickup'}
+                  </Text>
+                </TouchableOpacity>
+              ))}
+            </View>
           </View>
 
           {/* Delivery Address */}
           <TouchableOpacity style={styles.section}>
             <View style={styles.row}>
               <View style={styles.rowLeft}>
-                <Text style={styles.sectionTitle}>Choose a delivery address</Text>
+                <Text style={styles.sectionTitle}>
+                  Choose a delivery address
+                </Text>
                 <Text style={styles.sectionSubtitle}>Tap here to continue</Text>
               </View>
               <Ionicons name="chevron-forward" size={20} color="#999" />
@@ -159,13 +194,18 @@ const Page = () => {
             <TouchableOpacity
               style={styles.radioRow}
               onPress={() => setDeliveryTime('standard')}
-              disabled>
+              disabled
+            >
               <View style={styles.radioLeft}>
                 <View style={styles.radioCircle}>
-                  {deliveryTime === 'standard' && <View style={styles.radioSelected} />}
+                  {deliveryTime === 'standard' && (
+                    <View style={styles.radioSelected} />
+                  )}
                 </View>
                 <View>
-                  <Text style={[styles.radioLabel, styles.disabledText]}>Standard</Text>
+                  <Text style={[styles.radioLabel, styles.disabledText]}>
+                    Standard
+                  </Text>
                   <Text style={[styles.radioSubtext, styles.disabledText]}>
                     Currently unavailable
                   </Text>
@@ -174,14 +214,21 @@ const Page = () => {
             </TouchableOpacity>
 
             <Link href="/order/schedule" asChild>
-              <TouchableOpacity style={styles.radioRow} onPress={() => setDeliveryTime('schedule')}>
+              <TouchableOpacity
+                style={styles.radioRow}
+                onPress={() => setDeliveryTime('schedule')}
+              >
                 <View style={styles.radioLeft}>
                   <View style={styles.radioCircle}>
-                    {deliveryTime === 'schedule' && <View style={styles.radioSelected} />}
+                    {deliveryTime === 'schedule' && (
+                      <View style={styles.radioSelected} />
+                    )}
                   </View>
                   <View>
                     <Text style={styles.radioLabel}>Schedule</Text>
-                    <Text style={styles.radioSubtext}>Choose a delivery time</Text>
+                    <Text style={styles.radioSubtext}>
+                      Choose a delivery time
+                    </Text>
                   </View>
                 </View>
               </TouchableOpacity>
@@ -197,7 +244,9 @@ const Page = () => {
                 </View>
                 <Text style={styles.optionText}>Apple Pay</Text>
               </View>
-              <Text style={styles.paymentAmount}>{grandTotal.toFixed(2)} €</Text>
+              <Text style={styles.paymentAmount}>
+                {grandTotal.toFixed(2)} €
+              </Text>
             </View>
           </View>
 
@@ -212,21 +261,26 @@ const Page = () => {
           <View style={styles.section}>
             <Text style={styles.sectionHeader}>Add courier tip</Text>
             <Text style={styles.tipDescription}>
-              100% of your tip goes to your courier. It's an easy way to say thanks for great
-              service.
+              100% of your tip goes to your courier. It's an easy way to say
+              thanks for great service.
             </Text>
 
             <View style={styles.tipButtons}>
               {[0, 1, 2, 5].map((amount) => (
                 <TouchableOpacity
                   key={amount}
-                  style={[styles.tipButton, tipAmount === amount && styles.tipButtonActive]}
-                  onPress={() => setTipAmount(amount)}>
+                  style={[
+                    styles.tipButton,
+                    tipAmount === amount && styles.tipButtonActive,
+                  ]}
+                  onPress={() => setTipAmount(amount)}
+                >
                   <Text
                     style={[
                       styles.tipButtonText,
                       tipAmount === amount && styles.tipButtonTextActive,
-                    ]}>
+                    ]}
+                  >
                     {amount === 0 ? 'No tip' : `${amount} €`}
                   </Text>
                 </TouchableOpacity>
@@ -241,7 +295,11 @@ const Page = () => {
           <View style={styles.section}>
             <TouchableOpacity style={styles.summaryHeader}>
               <Text style={styles.summaryHeaderText}>How fees work</Text>
-              <Ionicons name="chevron-forward" size={16} color={Colors.secondary} />
+              <Ionicons
+                name="chevron-forward"
+                size={16}
+                color={Colors.secondary}
+              />
             </TouchableOpacity>
 
             <View style={styles.summaryRow}>
@@ -256,19 +314,25 @@ const Page = () => {
 
             <View style={styles.summaryRow}>
               <Text style={styles.summaryLabel}>Delivery fee</Text>
-              <Text style={styles.summaryValue}>{deliveryFee.toFixed(2)} €</Text>
+              <Text style={styles.summaryValue}>
+                {deliveryFee.toFixed(2)} €
+              </Text>
             </View>
 
             {tipAmount > 0 && (
               <View style={styles.summaryRow}>
                 <Text style={styles.summaryLabel}>Courier tip</Text>
-                <Text style={styles.summaryValue}>{tipAmount.toFixed(2)} €</Text>
+                <Text style={styles.summaryValue}>
+                  {tipAmount.toFixed(2)} €
+                </Text>
               </View>
             )}
 
             <View style={[styles.summaryRow, styles.summaryTotal]}>
               <Text style={styles.summaryTotalText}>Total</Text>
-              <Text style={styles.summaryTotalValue}>{grandTotal.toFixed(2)} €</Text>
+              <Text style={styles.summaryTotalValue}>
+                {grandTotal.toFixed(2)} €
+              </Text>
             </View>
           </View>
 
@@ -277,7 +341,10 @@ const Page = () => {
         </View>
       </Animated.ScrollView>
 
-      <PurchaseButton onPress={handleCheckout} deliveryTimeSelected={deliveryTime === 'schedule'} />
+      <PurchaseButton
+        onPress={handleCheckout}
+        deliveryTimeSelected={deliveryTime === 'schedule'}
+      />
     </View>
   );
 };
@@ -287,7 +354,34 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#f5f5f5',
   },
+  segmentedContainer: {
+    flexDirection: 'row',
+    backgroundColor: '#f5f5f5',
+    borderRadius: 12,
+    padding: 4,
+  },
 
+  segment: {
+    flex: 1,
+    paddingVertical: 12,
+    alignItems: 'center',
+    borderRadius: 10,
+  },
+
+  segmentActive: {
+    backgroundColor: '#fff',
+  },
+
+  segmentText: {
+    fontSize: 15,
+    fontWeight: '500',
+    color: '#666',
+  },
+
+  segmentTextActive: {
+    color: '#000',
+    fontWeight: '600',
+  },
   backButton: {
     width: 40,
     height: 40,

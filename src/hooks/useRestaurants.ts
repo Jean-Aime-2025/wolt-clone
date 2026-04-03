@@ -1,0 +1,35 @@
+import { restaurantService } from '@/services/restaurantService';
+import { useQuery } from '@tanstack/react-query';
+
+/**
+ * Hook to fetch all restaurants
+ */
+export const useRestaurants = () => {
+  return useQuery({
+    queryKey: ['restaurants'],
+    queryFn: async () => {
+      return restaurantService.getAll();
+    },
+  });
+};
+
+/**
+ * Hook to fetch a single restaurant by ID
+ */
+export const useRestaurant = (id: string) => {
+  return useQuery({
+    queryKey: ['restaurant', id],
+    queryFn: () => restaurantService.getById(id),
+    enabled: !!id,
+  });
+};
+
+/**
+ * Hook to fetch restaurant markers for map
+ */
+export const useRestaurantMarkers = () => {
+  return useQuery({
+    queryKey: ['restaurant-markers'],
+    queryFn: restaurantService.getMarkers,
+  });
+};
